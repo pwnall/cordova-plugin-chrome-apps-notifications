@@ -246,25 +246,24 @@ if (cordova.platformId != 'android') {
             })(k);
         }
     }
-    return;
-}
-
-channel.createSticky('onChromeNotificationsReady');
-channel.waitForInitialization('onChromeNotificationsReady');
-channel.onCordovaReady.subscribe(function() {
-    storage.internal.get(['notifications','notificationOptions'], function(values) {
-        notifications = values.notifications || {};
-        notifications.__proto__ = null;
-        notificationOptions = values.notificationOptions || {};
-        notificationOptions.__proto__ = null;
-        exec(onMessageFromNative, undefined, 'ChromeNotifications', 'messageChannel', []);
-        helpers.runAtStartUp(function() {
-            if (eventsToFireOnStartUp.length) {
-                helpers.queueLifeCycleEvent(firePendingEvents);
-            } else {
-                eventsToFireOnStartUp = null;
-            }
+} else {
+    channel.createSticky('onChromeNotificationsReady');
+    channel.waitForInitialization('onChromeNotificationsReady');
+    channel.onCordovaReady.subscribe(function() {
+        storage.internal.get(['notifications','notificationOptions'], function(values) {
+            notifications = values.notifications || {};
+            notifications.__proto__ = null;
+            notificationOptions = values.notificationOptions || {};
+            notificationOptions.__proto__ = null;
+            exec(onMessageFromNative, undefined, 'ChromeNotifications', 'messageChannel', []);
+            helpers.runAtStartUp(function() {
+                if (eventsToFireOnStartUp.length) {
+                    helpers.queueLifeCycleEvent(firePendingEvents);
+                } else {
+                    eventsToFireOnStartUp = null;
+                }
+            });
+            channel.initializationComplete('onChromeNotificationsReady');
         });
-        channel.initializationComplete('onChromeNotificationsReady');
     });
-});
+}
